@@ -23,23 +23,21 @@ jobs:
         with:
           gradle-version: '8.2'
 
-      - name: Show project structure
-        run: |
-          echo "=== files ==="
-          find . -name "*.gradle" -o -name "settings.gradle" | head -20
-          echo "=== settings ==="
-          cat settings.gradle
-          echo "=== root build ==="
-          cat build.gradle
-          echo "=== app build ==="
-          cat app/build.gradle
-
       - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace --info | head -100
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: Find APK
+        run: |
+          echo "=== looking for apk ==="
+          find . -name "*.apk" -type f 2>/dev/null || echo "none found"
+          echo "=== app/build tree ==="
+          find app/build -type d 2>/dev/null | head -20 || echo "no app/build"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: codm-flat-app
-          path: app/build/outputs/apk/debug/*.apk
+          path: |
+            app/build/outputs/apk/**/*.apk
+            **/build/outputs/apk/**/*.apk
           if-no-files-found: error
