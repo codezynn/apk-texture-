@@ -20,15 +20,22 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.2'
+
+      - name: Show project structure
+        run: |
+          echo "=== files ==="
+          find . -name "*.gradle" -o -name "settings.gradle" | head -20
+          echo "=== settings ==="
+          cat settings.gradle
+          echo "=== root build ==="
+          cat build.gradle
+          echo "=== app build ==="
+          cat app/build.gradle
 
       - name: Build debug APK
-        run: |
-          if [ -f gradlew ]; then
-            chmod +x gradlew
-            ./gradlew assembleDebug --stacktrace
-          else
-            gradle assembleDebug --stacktrace
-          fi
+        run: gradle :app:assembleDebug --stacktrace --info | head -100
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
